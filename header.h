@@ -6,6 +6,7 @@
 #define PROBE_REQUEST 1
 #define PROBE_RESPONSE 2
 #define QOS_DATA 3
+#define QOS_NULL 4
 
 #pragma pack(push, 1)
 typedef struct present_flags{
@@ -76,9 +77,9 @@ typedef struct radiotap_header{
 }radiotap_header;
 
 typedef struct Dot11_Frame_Control_Field{
-    uint8_t Subtype:4;
-    uint8_t Type:2;
     uint8_t Version:2;
+    uint8_t Type:2;
+    uint8_t Subtype:4;
     uint8_t Flags;
 }Dot11_Frame_Control_Field;
 
@@ -91,6 +92,13 @@ typedef struct Dot11{
     uint16_t number;
 }Dot11;
 
+typedef struct Dot11_data{
+    Dot11_Frame_Control_Field Frame_Control_Field;
+    uint16_t duration;
+    uint8_t mac1[6];
+    uint8_t mac2[6];
+}Dot11_data;
+
 typedef struct MAC{
     uint8_t mac[6];
     bool operator <(const MAC& var) const
@@ -99,10 +107,23 @@ typedef struct MAC{
     }
 }MAC;
 
+typedef struct CONV_MAC{
+    uint8_t bssid[6];
+    uint8_t station[6];
+    bool operator <(const CONV_MAC& var) const
+    {
+        if(memcmp(bssid, var.bssid, sizeof(bssid)) != 0){
+            return memcmp(bssid, var.bssid, sizeof(bssid)) < 0;
+        }else{
+            return memcmp(station, var.station, sizeof(station)) < 0;
+        }
+    }
+}CONV_MAC;
+
 typedef struct Beacon_values{
     uint8_t PWR;
     uint16_t CH;
-    int Beacons;
+    int Beacons = 1;
     uint8_t ssid[20];
 
     bool operator <(const Beacon_values& var) const
@@ -120,22 +141,19 @@ typedef struct Beacon_values{
 }Beacon_values;
 
 typedef struct Probe_values{
-    uint8_t station[6];
     uint8_t PWR;
     uint16_t CH;
-    int Beacons;
+    int Frames = 1;
     uint8_t probe[20];
 
     bool operator <(const Probe_values& var) const
     {
-        if(memcmp(station, var.station, sizeof(station)) != 0){
-            memcmp(station, var.station, sizeof(station)) < 0;
-        }else if(PWR != var.PWR){
+        if(PWR != var.PWR){
             return PWR < var.PWR;
         }else if(CH != var.CH){
             return CH < var.CH;
-        }else if(Beacons != var.Beacons){
-            return Beacons < var.Beacons;
+        }else if(Frames != var.Frames){
+            return Frames < var.Frames;
         }else{
             return memcmp(probe, var.probe, sizeof(probe)) < 0;
         }

@@ -10,11 +10,11 @@ void usage(){
 }
 
 int main(int argc, char * argv[]){
-
     if(argc < 2){
         usage();
         exit(1);
     }
+    init();
 
     // for test, pcap_open_offline
     // TODO: capture live packet
@@ -51,11 +51,7 @@ int main(int argc, char * argv[]){
         default:
             break;
         }
-
         show_airodump();
-
     }
     return 0;
-
-
 }

@@ -124,7 +124,7 @@ typedef struct Beacon_values{
     uint8_t PWR;
     uint16_t CH;
     int Beacons = 1;
-    uint8_t ssid[20];
+    uint8_t ssid[30];
 
     bool operator <(const Beacon_values& var) const
     {
@@ -142,16 +142,13 @@ typedef struct Beacon_values{
 
 typedef struct Probe_values{
     uint8_t PWR;
-    uint16_t CH;
     int Frames = 1;
-    uint8_t probe[20];
+    uint8_t probe[30];
 
     bool operator <(const Probe_values& var) const
     {
         if(PWR != var.PWR){
             return PWR < var.PWR;
-        }else if(CH != var.CH){
-            return CH < var.CH;
         }else if(Frames != var.Frames){
             return Frames < var.Frames;
         }else{

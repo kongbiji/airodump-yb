@@ -16,12 +16,10 @@ int main(int argc, char * argv[]){
     }
     init();
 
-    // for test, pcap_open_offline
-    // TODO: capture live packet
     char errbuf[PCAP_ERRBUF_SIZE];
-    pcap_t* handle = pcap_open_offline(argv[1], errbuf);
+    pcap_t* handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
     if (handle == NULL) {
-        fprintf(stderr, "couldn't open file %s: %s\n", argv[1], errbuf);
+        fprintf(stderr, "couldn't open device %s: %s\n", argv[1], errbuf);
         return -1;
     }
     
@@ -51,7 +49,9 @@ int main(int argc, char * argv[]){
         default:
             break;
         }
+
         show_airodump();
+
     }
     return 0;
 }

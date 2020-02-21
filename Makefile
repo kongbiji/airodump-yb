@@ -1,4 +1,4 @@
-CC	   = g++
+CC     = g++
 CFLAGS = -g -Wall
 OBJS   = airodump-yb.o
 TARGET = airodump-yb

@@ -3,6 +3,7 @@
 #include <pcap.h>
 #include "header.h"
 #include "function.h"
+#include<time.h>
 
 void usage(){
     printf("usage:   airodump-yb <interface>\n");
@@ -16,11 +17,25 @@ int main(int argc, char * argv[]){
     }
     init();
 
+    clock_t CurTime, OldTime;
+
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t* handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
     if (handle == NULL) {
         fprintf(stderr, "couldn't open device %s: %s\n", argv[1], errbuf);
         return -1;
+    }
+
+    pthread_t p_thread;
+    int thr_id;
+    int status;
+    char * p;
+    strcpy(p, argv[1]);
+
+    thr_id = pthread_create(&p_thread, NULL, channel_hop, (void *)p);
+    if (thr_id < 0){
+        perror("thread create error : ");
+        exit(0);
     }
     
     while(handle != NULL){
@@ -49,9 +64,14 @@ int main(int argc, char * argv[]){
         default:
             break;
         }
-
+        OldTime = clock();
         show_airodump();
-
+        while (1){
+            CurTime = clock();
+            if (CurTime - OldTime > 33)
+                break;
+        }
     }
+    pthread_join(p_thread, (void **)&status);
     return 0;
 }

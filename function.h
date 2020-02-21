@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <map>
+#include <unistd.h>
 #include "header.h"
 
 using namespace std;
@@ -14,10 +15,35 @@ map<CONV_MAC, Probe_values> probe_map;
 map<CONV_MAC, Probe_values>::iterator probe_iter;
 
 MAC BROADCAST;
+
+void * channel_hop(void * data){
+    char command[50], chan_num[3], real_command[50];
+    int CHAN_NUM[14]= {1,7,13,2,8,3,14,9,4,10,5,11,6,12};
+    int i = 0; 
+
+    memset(command, 0, sizeof(command));
+    strcpy(command, "sudo iwconfig ");
+    strcat(command, (char *)data );
+    strcat(command, " channel ");
+
+    while(1){
+        real_command[0] = '\0';
+        chan_num[0] = '\0';
+        sprintf(chan_num, "%d", CHAN_NUM[i]);
+        strcpy(real_command, command);
+        strcat(real_command, chan_num);
+        system(real_command);
+        i++;
+        if(i > 14){
+            i = 0;
+        }
+        sleep(1.5);
+    }
+
+}
 void init(){
     memcpy(BROADCAST.mac,"\xFF\xFF\xFF\xFF\xFF\xFF", sizeof(BROADCAST.mac));
 }
-
 // check Type/Subtpye
 int check_packet_type(const unsigned char * data){
     radiotap_header * r_header = (radiotap_header *)malloc(sizeof(radiotap_header));

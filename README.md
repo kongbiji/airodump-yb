@@ -23,4 +23,3 @@ sudo ./airodump-yb <wlan interface>
 ```
 
 # TODO
-Smooth output is required...
